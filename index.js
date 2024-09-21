@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { readTasks, writeTasks } from "./utils/handleFile.js";
 import { getUsers } from "./utils/handleUser.js";
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(express.json());
