@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
-import { readTasks, writeTasks } from "./utils/handlerFile.js";
+import { readTasks, writeTasks } from "./utils/handleFile.js";
+import { getUsers } from "./utils/handleUser.js";
 
 const PORT = 3000;
 const app = express();
@@ -10,10 +12,41 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-    res.send("Hello World!");
+const SECRET_KEY = "esto_es_un_secreto";
+
+// MIDDLEWARE:
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+  
+    if (!token) return res.status(401).json({ message: 'Token requerido' });
+  
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if (err) return res.status(403).json({ message: 'Token no válido' });
+      req.user = user;
+      next();
+    });
+};
+
+//________________________________________________________
+//_______AUTH:
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+    const users = getUsers();
+  
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
+  
+    // Generar el token con el nombre de usuario en el payload
+    // const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ username: user.username }, SECRET_KEY);
+    res.json({ token });
 })
 
+// Middleware tasks:
+app.use('/tasks', authenticateToken);
 //________________________________________________________
 //____GET:
 // All tasks:
