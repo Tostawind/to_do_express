@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "text": "Task 1 (actualizada)",
+    "isDone": true,
+    "priorirty": 1
+  },
+  {
+    "id": "f03b60f2-b60f-4627-ae25-0c20353e4c87",
+    "text": "Nueva tarea creada",
+    "isDone": false,
+    "priority": 0
+  }
+]
